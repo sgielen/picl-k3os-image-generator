@@ -50,18 +50,16 @@ IMAGE_SIZE=$(($BOOT_CAPACITY + $ROOT_CAPACITY))
 rm -f $IMAGE
 fallocate -l ${IMAGE_SIZE}M $IMAGE
 parted -s $IMAGE mklabel msdos
-parted -s $IMAGE unit MB mkpart primary 1 $BOOT_CAPACITY
+parted -s $IMAGE unit MB mkpart primary fat32 1 $BOOT_CAPACITY
 parted -s $IMAGE unit MB mkpart primary $(($BOOT_CAPACITY+1)) $IMAGE_SIZE
 parted -s $IMAGE set 1 boot on
 
 ## Make the filesystems
 LODEV=`sudo losetup --show -f $IMAGE`
-echo "lodev: $LODEV"
 sudo kpartx -a $LODEV
 sleep 1
 LODEV_BOOT=$(sudo losetup -f --show /dev/mapper/`basename ${LODEV}`p1)
 LODEV_ROOT=$(sudo losetup -f --show /dev/mapper/`basename ${LODEV}`p2)
-echo "lodev_boot: $LODEV_BOOT"
 sudo mkfs.fat $LODEV_BOOT
 sudo mkfs.ext4 -F $LODEV_ROOT
 sudo tune2fs -i 1m $LODEV_ROOT
