@@ -1,0 +1,4 @@
+config.yaml
+k3os-rootfs-arm64.tar.gz
+picl-k3os-*.img
+raspberrypi-firmware.tar.gz
