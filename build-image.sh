@@ -58,8 +58,8 @@ parted -s $IMAGE set 1 boot on
 LODEV=`sudo losetup --show -f $IMAGE`
 sudo kpartx -a $LODEV
 sleep 1
-LODEV_BOOT=$(sudo losetup -f --show /dev/mapper/`basename ${LODEV}`p1)
-LODEV_ROOT=$(sudo losetup -f --show /dev/mapper/`basename ${LODEV}`p2)
+LODEV_BOOT=/dev/mapper/`basename ${LODEV}`p1
+LODEV_ROOT=/dev/mapper/`basename ${LODEV}`p2
 sudo mkfs.fat $LODEV_BOOT
 sudo mkfs.ext4 -F $LODEV_ROOT
 sudo tune2fs -i 1m $LODEV_ROOT
@@ -84,13 +84,26 @@ sudo tar -xf k3os-rootfs-arm64.tar.gz --strip 1 -C root
 sudo cp config.yaml root/k3os/system
 K3OS_VERSION=$(ls --indicator-style=none root/k3os/system/k3os | grep -v current | head -n1)
 
+## Set correct kernel, config and cmdline
+cat <<EOF | sudo tee boot/config.txt >/dev/null
+dtoverlay=vc4-fkms-v3d
+gpu_mem=128
+arm_64bit=1
+
+[pi3]
+audio_pwm_mode=2
+[pi4]
+max_framebuffers=2
+kernel=kernel8.img
+[all]
+EOF
+PARTUUID=$(sudo blkid -o export $LODEV_ROOT | grep PARTUUID)
+echo "dwc_otg.lpm_enable=0 root=$PARTUUID rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait" | sudo tee boot/cmdline.txt >/dev/null
+
 ## Clean up
 sync
 sudo umount boot
 sudo umount root
-sleep 1
-sudo losetup -d $LODEV_BOOT
-sudo losetup -d $LODEV_ROOT
 sleep 1
 sudo kpartx -d $LODEV
 sleep 1
