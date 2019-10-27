@@ -28,6 +28,10 @@ assert_tool mkfs.fat
 assert_tool mkfs.ext4
 assert_tool tune2fs
 assert_tool e2label
+assert_tool mktemp
+assert_tool ar
+assert_tool blkid
+assert_tool realpath
 
 ## Download dependencies
 echo "== Checking or downloading dependencies... =="
@@ -37,6 +41,10 @@ fi
 
 if [ ! -f "k3os-rootfs-arm64.tar.gz" ]; then
 	wget https://github.com/rancher/k3os/releases/download/v0.5.0/k3os-rootfs-arm64.tar.gz
+fi
+
+if [ ! -f "busybox-static-arm64.deb" ]; then
+	wget -O busybox-static-arm64.deb https://launchpadlibrarian.net/414117080/busybox-static_1.27.2-2ubuntu3.2_arm64.deb
 fi
 
 ## Make the image (capacity in MB, not MiB)
@@ -99,6 +107,27 @@ kernel=kernel8.img
 EOF
 PARTUUID=$(sudo blkid -o export $LODEV_ROOT | grep PARTUUID)
 echo "dwc_otg.lpm_enable=0 root=$PARTUUID rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait" | sudo tee boot/cmdline.txt >/dev/null
+
+## Install busybox and write an init
+PITEMP="$(mktemp -d)"
+BUSYBOXDEB="$(realpath 'busybox-static-arm64.deb')"
+pushd $PITEMP
+ar x $BUSYBOXDEB data.tar.xz
+tar -xf data.tar.xz
+popd
+sudo mkdir root/bin
+sudo cp $PITEMP/bin/busybox root/bin/busybox
+for i in sh echo sleep uname ls lsmod modprobe; do
+	sudo ln -s busybox root/bin/$i
+done
+
+sudo rm root/sbin/init
+cat <<EOF | sudo tee root/sbin/init >/dev/null
+#!/bin/sh
+modprobe squashfs
+exec /sbin/k3os
+EOF
+sudo chmod +x root/sbin/init
 
 ## Clean up
 sync
