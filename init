@@ -1,0 +1,3 @@
+#!/bin/sh
+modprobe squashfs
+exec /sbin/k3os

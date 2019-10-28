@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# sleep a second for devices to settle
+sleep 1
+
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+# Unpack tools for resizing root FS
+mount -t tmpfs -o size=50m none /tmp
+tar -xJf /root-resize.tar.xz --strip 1 -C /tmp
+
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/tmp/sbin:/tmp/bin:/tmp/usr/sbin:/tmp/usr/bin
+export LD_LIBRARY_PATH=/tmp/lib:/tmp/lib/aarch64-linux-gnu:/tmp/usr/lib:/tmp/usr/lib/aarch64-linux-gnu
+
+PARTUUID=$(cat /proc/cmdline | sed -r 's/^.*PARTUUID=([^ ]+).*$/\1/')
+ROOTDEVICE=$(blkid | grep PARTUUID=\"$PARTUUID\" | awk -F: '{print $1}')
+ROOTDISK=/dev/$(basename $(dirname $(readlink /sys/class/block/$(basename $ROOTDEVICE))))
+
+echo "== Performing filesystem check on root device $ROOTDEVICE... =="
+e2fsck -pv $ROOTDEVICE
+sleep 5
+echo "== Resizing root filesystem on $ROOTDISK... =="
+parted -s $ROOTDISK resizepart 2 100%
+mount -o remount,rw /
+resize2fs $ROOTDEVICE
+sleep 5
+
+echo "== Setting proper init... =="
+mount ${ROOTDISK}p1 /boot
+sed -i 's# init=/sbin/init.resizefs##' /boot/cmdline.txt
+# TODO: update partuuid? does not seem to be necessary?
+umount /boot
+
+echo "== Cleaning up and rebooting... =="
+rm /root-resize.tar.xz
+rm /sbin/init.resizefs
+sync
+mount -o remount,ro /
+sleep 5
+reboot -f
