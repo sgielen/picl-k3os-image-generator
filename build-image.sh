@@ -32,69 +32,39 @@ assert_tool realpath
 
 ## Download dependencies
 echo "== Checking or downloading dependencies... =="
-if [ ! -f "raspberrypi-firmware.tar.gz" ]; then
-	wget -O raspberrypi-firmware.tar.gz https://github.com/raspberrypi/firmware/archive/1.20190925.tar.gz
-fi
 
-if [ ! -f "k3os-rootfs-arm64.tar.gz" ]; then
-	wget https://github.com/rancher/k3os/releases/download/v0.5.0/k3os-rootfs-arm64.tar.gz
-fi
+function dl_dep() {
+	if [ ! -f "deps/$1" ]; then
+		wget -O $1 $2
+	fi
+}
+
+mkdir -p deps
+dl_dep raspberrypi-firmware.tar.gz https://github.com/raspberrypi/firmware/archive/1.20190925.tar.gz
+dl_dep k3os-rootfs-arm64.tar.gz https://github.com/rancher/k3os/releases/download/v0.5.0/k3os-rootfs-arm64.tar.gz
 
 # To find the URL for these packages:
 # - Go to https://launchpad.net/ubuntu/bionic/arm64/<package name>/
 # - Under 'Publishing history', click the version number in the top row
 # - Under 'Downloadable files', use the URL of the .deb file
 # - Change http to https
-# - Use wget -O to save the file to a filename without a version number
 
-if [ ! -f "libc6-arm64.deb" ]; then
-	wget -O libc6-arm64.deb https://launchpadlibrarian.net/365857916/libc6_2.27-3ubuntu1_arm64.deb
-fi
-if [ ! -f "busybox-arm64.deb" ]; then
-	wget -O busybox-arm64.deb https://launchpadlibrarian.net/414117084/busybox_1.27.2-2ubuntu3.2_arm64.deb
-fi
-if [ ! -f "libcom-err2-arm64.deb" ]; then
-	wget -O libcom-err2-arm64.deb https://launchpadlibrarian.net/444344115/libcom-err2_1.44.1-1ubuntu1.2_arm64.deb
-fi
-if [ ! -f "libblkid1-arm64.deb" ]; then
-	wget -O libblkid1-arm64.deb https://launchpadlibrarian.net/438655401/libblkid1_2.31.1-0.4ubuntu3.4_arm64.deb
-fi
-if [ ! -f "libuuid1-arm64.deb" ]; then
-	wget -O libuuid1-arm64.deb https://launchpadlibrarian.net/438655406/libuuid1_2.31.1-0.4ubuntu3.4_arm64.deb
-fi
-if [ ! -f "libext2fs2-arm64.deb" ]; then
-	wget -O libext2fs2-arm64.deb https://launchpadlibrarian.net/444344116/libext2fs2_1.44.1-1ubuntu1.2_arm64.deb
-fi
-if [ ! -f "e2fsprogs-arm64.deb" ]; then
-	wget -O e2fsprogs-arm64.deb https://launchpadlibrarian.net/444344112/e2fsprogs_1.44.1-1ubuntu1.2_arm64.deb
-fi
-if [ ! -f "parted-arm64.deb" ]; then
-	wget -O parted-arm64.deb https://launchpadlibrarian.net/415806982/parted_3.2-20ubuntu0.2_arm64.deb
-fi
-if [ ! -f "libparted2-arm64.deb" ]; then
-	wget -O libparted2-arm64.deb https://launchpadlibrarian.net/415806981/libparted2_3.2-20ubuntu0.2_arm64.deb
-fi
-if [ ! -f "libreadline7-arm64.deb" ]; then
-	wget -O libreadline7-arm64.deb https://launchpadlibrarian.net/354246199/libreadline7_7.0-3_arm64.deb
-fi
-if [ ! -f "libtinfo5-arm64.deb" ]; then
-	wget -O libtinfo5-arm64.deb https://launchpadlibrarian.net/371711519/libtinfo5_6.1-1ubuntu1.18.04_arm64.deb
-fi
-if [ ! -f "libdevmapper1-arm64.deb" ]; then
-	wget -O libdevmapper1-arm64.deb https://launchpadlibrarian.net/431292125/libdevmapper1.02.1_1.02.145-4.1ubuntu3.18.04.1_arm64.deb
-fi
-if [ ! -f "libselinux1-arm64.deb" ]; then
-	wget -O libselinux1-arm64.deb https://launchpadlibrarian.net/359065467/libselinux1_2.7-2build2_arm64.deb
-fi
-if [ ! -f "libudev1-arm64.deb" ]; then
-	wget -O libudev1-arm64.deb https://launchpadlibrarian.net/444834685/libudev1_237-3ubuntu10.31_arm64.deb
-fi
-if [ ! -f "libpcre3-arm64.deb" ]; then
-	wget -O libpcre3-arm64.deb https://launchpadlibrarian.net/355683636/libpcre3_8.39-9_arm64.deb
-fi
-if [ ! -f "util-linux-arm64.deb" ]; then
-	wget -O util-linux-arm64.deb https://launchpadlibrarian.net/438655410/util-linux_2.31.1-0.4ubuntu3.4_arm64.deb
-fi
+dl_dep libc6-arm64.deb https://launchpadlibrarian.net/365857916/libc6_2.27-3ubuntu1_arm64.deb
+dl_dep busybox-arm64.deb https://launchpadlibrarian.net/414117084/busybox_1.27.2-2ubuntu3.2_arm64.deb
+dl_dep libcom-err2-arm64.deb https://launchpadlibrarian.net/444344115/libcom-err2_1.44.1-1ubuntu1.2_arm64.deb
+dl_dep libblkid1-arm64.deb https://launchpadlibrarian.net/438655401/libblkid1_2.31.1-0.4ubuntu3.4_arm64.deb
+dl_dep libuuid1-arm64.deb https://launchpadlibrarian.net/438655406/libuuid1_2.31.1-0.4ubuntu3.4_arm64.deb
+dl_dep libext2fs2-arm64.deb https://launchpadlibrarian.net/444344116/libext2fs2_1.44.1-1ubuntu1.2_arm64.deb
+dl_dep e2fsprogs-arm64.deb https://launchpadlibrarian.net/444344112/e2fsprogs_1.44.1-1ubuntu1.2_arm64.deb
+dl_dep parted-arm64.deb https://launchpadlibrarian.net/415806982/parted_3.2-20ubuntu0.2_arm64.deb
+dl_dep libparted2-arm64.deb https://launchpadlibrarian.net/415806981/libparted2_3.2-20ubuntu0.2_arm64.deb
+dl_dep libreadline7-arm64.deb https://launchpadlibrarian.net/354246199/libreadline7_7.0-3_arm64.deb
+dl_dep libtinfo5-arm64.deb https://launchpadlibrarian.net/371711519/libtinfo5_6.1-1ubuntu1.18.04_arm64.deb
+dl_dep libdevmapper1-arm64.deb https://launchpadlibrarian.net/431292125/libdevmapper1.02.1_1.02.145-4.1ubuntu3.18.04.1_arm64.deb
+dl_dep libselinux1-arm64.deb https://launchpadlibrarian.net/359065467/libselinux1_2.7-2build2_arm64.deb
+dl_dep libudev1-arm64.deb https://launchpadlibrarian.net/444834685/libudev1_237-3ubuntu10.31_arm64.deb
+dl_dep libpcre3-arm64.deb https://launchpadlibrarian.net/355683636/libpcre3_8.39-9_arm64.deb
+dl_dep util-linux-arm64.deb https://launchpadlibrarian.net/438655410/util-linux_2.31.1-0.4ubuntu3.4_arm64.deb
 
 ## Make the image (capacity in MB, not MiB)
 echo "== Making image and filesystems... =="
@@ -138,14 +108,14 @@ sudo mknod -m 0666 root/dev/null c 1 3
 ## Unpack root and boot
 echo "== Unpacking firmware and rootfs... =="
 PITEMP="$(mktemp -d)"
-sudo tar -xf raspberrypi-firmware.tar.gz --strip 1 -C $PITEMP
+sudo tar -xf deps/raspberrypi-firmware.tar.gz --strip 1 -C $PITEMP
 sudo cp -R $PITEMP/boot/* boot
 sudo mkdir -p root/lib
 sudo cp -R $PITEMP/modules root/lib
 sudo rm -rf $PITEMP
 
 ## Unpack k3os
-sudo tar -xf k3os-rootfs-arm64.tar.gz --strip 1 -C root
+sudo tar -xf deps/k3os-rootfs-arm64.tar.gz --strip 1 -C root
 sudo cp config.yaml root/k3os/system
 K3OS_VERSION=$(ls --indicator-style=none root/k3os/system/k3os | grep -v current | head -n1)
 
@@ -167,7 +137,7 @@ echo "dwc_otg.lpm_enable=0 root=$PARTUUID rootfstype=ext4 elevator=deadline fsck
 
 ## Install busybox
 unpack_deb() {
-	ar x $1
+	ar x deps/$1
 	sudo tar -xf data.tar.[gx]z -C $2
 	rm -f data.tar.gz data.tar.xz control.tar.gz control.tar.xz debian-binary
 }
