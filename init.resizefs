@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # sleep a second for devices to settle
 sleep 1
 
@@ -22,6 +24,7 @@ e2fsck -pv $ROOTDEVICE
 sleep 5
 echo "== Resizing root filesystem on $ROOTDISK... =="
 parted -s $ROOTDISK resizepart 2 100%
+sleep 5
 mount -o remount,rw /
 resize2fs $ROOTDEVICE
 sleep 5
@@ -29,13 +32,25 @@ sleep 5
 echo "== Setting proper init... =="
 mount ${ROOTDISK}p1 /boot
 sed -i 's# init=/sbin/init.resizefs##' /boot/cmdline.txt
-# TODO: update partuuid? does not seem to be necessary?
+NEW_PARTUUID=$(blkid -o export $ROOTDEVICE | grep PARTUUID)
+sed -i "s# root=PARTUUID=$PARTUUID # root=$NEW_PARTUUID #" /boot/cmdline.txt
 umount /boot
 
 echo "== Cleaning up and rebooting... =="
 rm /root-resize.tar.xz
 rm /sbin/init.resizefs
+# exec into another script so that /sbin/init.resizefs (this script) can be deleted,
+# so the filesystem can be mounted read-only
+cat <<EOF >/tmp/reboot
+#!/bin/sh
+set -e
 sync
-mount -o remount,ro /
+sleep 5
+mount -o remount,ro / || echo u > /proc/sysrq-trigger || true
+sleep 5
+e2fsck -fyv $ROOTDEVICE || true
 sleep 5
 reboot -f
+EOF
+chmod +x /tmp/reboot
+exec /tmp/reboot
