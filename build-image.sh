@@ -2,9 +2,11 @@
 
 set -e
 
-## Check if we have the config.yaml
-if [ ! -e "config.yaml" ]; then
-	echo "config.yaml is missing, please create it" >&2
+## Check if we have any configs
+if [ -z "$(ls config/*.yaml)" ]; then
+	echo "There are no .yaml files in config/, please create them." >&2
+	echo "Their name must be the MAC address of eth0, e.g.:" >&2
+	echo "  config/dc:a6:32:aa:bb:cc.yaml" >&2
 	exit 1
 fi
 
@@ -116,7 +118,8 @@ sudo rm -rf $PITEMP
 
 ## Unpack k3os
 sudo tar -xf deps/k3os-rootfs-arm64.tar.gz --strip 1 -C root
-sudo cp config.yaml root/k3os/system
+# config.yaml will be created by init.resizefs based on MAC of eth0
+sudo cp -R config root/k3os/system
 K3OS_VERSION=$(ls --indicator-style=none root/k3os/system/k3os | grep -v current | head -n1)
 
 ## Set correct kernel, config and cmdline

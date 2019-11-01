@@ -36,6 +36,18 @@ NEW_PARTUUID=$(blkid -o export $ROOTDEVICE | grep PARTUUID)
 sed -i "s# root=PARTUUID=$PARTUUID # root=$NEW_PARTUUID #" /boot/cmdline.txt
 umount /boot
 
+echo "== Linking correct config... =="
+# TODO: what if this device doesn't have eth0, but has other interfaces? Loop through them?
+MY_MAC=$(cat /sys/class/net/eth0/address)
+if [ -r "/k3os/system/config/${MY_MAC}.yaml" ]; then
+	ln -s /k3os/system/config/${MY_MAC}.yaml /k3os/system/config.yaml
+else
+	# TODO: retrieve config from a master?
+	echo "Error: No configuration found for MAC ${MY_MAC}." >&2
+	echo "Ensure that config/${MY_MAC}.yaml exists." >&2
+	exit 1
+fi
+
 echo "== Cleaning up and rebooting... =="
 rm /root-resize.tar.xz
 rm /sbin/init.resizefs
