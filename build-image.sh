@@ -37,7 +37,7 @@ echo "== Checking or downloading dependencies... =="
 
 function dl_dep() {
 	if [ ! -f "deps/$1" ]; then
-		wget -O $1 $2
+		wget -O deps/$1 $2
 	fi
 }
 
