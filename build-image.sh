@@ -19,6 +19,7 @@ assert_tool() {
 }
 
 assert_tool wget
+assert_tool mktemp
 assert_tool fallocate
 assert_tool parted
 assert_tool kpartx
@@ -70,13 +71,12 @@ dl_dep util-linux-arm64.deb https://launchpadlibrarian.net/438655410/util-linux_
 
 ## Make the image (capacity in MB, not MiB)
 echo "== Making image and filesystems... =="
-IMAGE=picl-k3os-build.iso
+IMAGE=$(mktemp picl-k3os-build.iso.XXXXXX)
 BOOT_CAPACITY=60
 # Initial root size. The partition will be resized to the SD card's maximum on first boot.
 ROOT_CAPACITY=400
 IMAGE_SIZE=$(($BOOT_CAPACITY + $ROOT_CAPACITY))
 
-rm -f $IMAGE
 fallocate -l ${IMAGE_SIZE}M $IMAGE
 parted -s $IMAGE mklabel msdos
 parted -s $IMAGE unit MB mkpart primary fat32 1 $BOOT_CAPACITY
