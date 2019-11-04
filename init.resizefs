@@ -2,6 +2,8 @@
 
 set -e
 
+IMAGE_TYPE="@IMAGE_TYPE@"
+
 # sleep a second for devices to settle
 sleep 1
 
@@ -15,28 +17,42 @@ tar -xJf /root-resize.tar.xz --strip 1 -C /tmp
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/tmp/sbin:/tmp/bin:/tmp/usr/sbin:/tmp/usr/bin
 export LD_LIBRARY_PATH=/tmp/lib:/tmp/lib/aarch64-linux-gnu:/tmp/usr/lib:/tmp/usr/lib/aarch64-linux-gnu
 
-PARTUUID=$(cat /proc/cmdline | sed -r 's/^.*PARTUUID=([^ ]+).*$/\1/')
-ROOTDEVICE=$(blkid | grep PARTUUID=\"$PARTUUID\" | awk -F: '{print $1}')
+if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
+	PARTUUID=$(cat /proc/cmdline | sed -r 's/^.*PARTUUID=([^ ]+).*$/\1/')
+	ROOTDEVICE=$(blkid | grep PARTUUID=\"$PARTUUID\" | awk -F: '{print $1}')
+elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
+	ROOTDEVICE=$(cat /proc/cmdline | sed -r 's/.*root=([^ ]+) .*/\1/')
+fi
 ROOTDISK=/dev/$(basename $(dirname $(readlink /sys/class/block/$(basename $ROOTDEVICE))))
+PARTNUM=$(cat /sys/class/block/$(basename $ROOTDEVICE)/partition)
 
 echo "== Performing filesystem check on root device $ROOTDEVICE... =="
 e2fsck -pv $ROOTDEVICE
 sleep 5
 echo "== Resizing root filesystem on $ROOTDISK... =="
-parted -s $ROOTDISK resizepart 2 100%
+parted -s $ROOTDISK resizepart $PARTNUM 100%
 sleep 5
 mount -o remount,rw /
 resize2fs $ROOTDEVICE
 sleep 5
 
 echo "== Setting proper init... =="
-mount ${ROOTDISK}p1 /boot
-sed -i 's# init=/sbin/init.resizefs##' /boot/cmdline.txt
-NEW_PARTUUID=$(blkid -o export $ROOTDEVICE | grep PARTUUID)
-sed -i "s# root=PARTUUID=$PARTUUID # root=$NEW_PARTUUID #" /boot/cmdline.txt
-umount /boot
+if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
+	mount ${ROOTDISK}p1 /boot
+	sed -i 's# init=/sbin/init.resizefs##' /boot/cmdline.txt
+	NEW_PARTUUID=$(blkid -o export $ROOTDEVICE | grep PARTUUID)
+	sed -i "s# root=PARTUUID=$PARTUUID # root=$NEW_PARTUUID #" /boot/cmdline.txt
+	umount /boot
+elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
+	sed -i 's# init=/sbin/init.resizefs##' /boot/env.txt
+fi
 
 echo "== Linking correct config... =="
+if [ "$IMAGE_TYPE" = "orangepipc2" ]; then
+	modprobe dwmac_sun8i
+	sleep 1
+fi
+
 # TODO: what if this device doesn't have eth0, but has other interfaces? Loop through them?
 MY_MAC=$(cat /sys/class/net/eth0/address)
 if [ -r "/k3os/system/config/${MY_MAC}.yaml" ]; then

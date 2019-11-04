@@ -1,14 +1,19 @@
 # PiCl k3os image generator
 
-This project can be used to generate images for k3os compatible with the Raspberry Pi 3B+ and 4. Other models may be compatible as well, as long as they support the armv8 (aarch64) architecture.
+This project can be used to generate images for k3os compatible with various armv8 (aarch64) devices:
+
+- Raspberry Pi model 3B+
+- Raspberry Pi model 4
+- Orange Pi PC 2
+- (Other devices may be compatible as well. PRs welcome! Please file an issue if you need any help with porting.)
 
 ## Getting Started
 
-- First, make a list of devices you want to use in your k3s cluster and the MAC addresses of their eth0 interface. (To find the MAC, boot any supported OS, perhaps the one that comes on the included SD card if you have one, and `cat /sys/class/net/eth0/address`. Or, just continue with a dummy config and the initial boot will say "there is no config for MAC xx:xx:xx:xx:xx:xx", and then you know what to call it.)
+- First, make a list of devices you want to use in your k3s cluster, their hardware types and the MAC addresses of their eth0 interface. (To find the MAC, boot any supported OS, perhaps the one that comes on the included SD card if you have one, and `cat /sys/class/net/eth0/address`. Or, just continue with a dummy config and the initial boot will say "there is no config for MAC xx:xx:xx:xx:xx:xx", and then you know what to call it.)
 - In the config/ directory, create one configuration file for each device, named as `{MAC}.yaml` (e.g. `dc:a6:32:aa:bb:cc.yaml`). The appropriate file will be used as a config.yaml eventually.
-- Run `./build-image.sh`. It will check whether all dependencies are installed for creating the image, then proceeds to create the image as `picl-k3os-{k3osversion}.img`.
-- Write the image to as many SD cards as you have devices. The SD card must be at least 1 GB.
-- Insert the SD cards into the devices. On first boot, they will resize their root filesystems to the size of the SD card and will install their own config.yaml in the correct place based on their MAC address. After this, they will reboot.
+- Run `./build-image.sh <imagetype>` where imagetype is `raspberrypi` or `orangepipc2`. It will check whether all dependencies are installed for creating the image, then proceeds to create the image as `picl-k3os-{k3osversion}-{imagetype}.img`.
+- Write the image to the SD cards for each device. The SD card must be at least 1 GB.
+- Insert the SD cards into the devices, minding correct image type per device type, of course. On first boot, they will resize their root filesystems to the size of the SD card and will install their own config.yaml in the correct place based on their MAC address. After this, they will reboot.
 - On subsequent boots, k3os will run automatically with the correct per-device config.yaml.
 
 ## Performing updates
