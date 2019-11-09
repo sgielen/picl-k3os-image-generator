@@ -12,6 +12,7 @@ This project can be used to generate images for k3os compatible with various arm
 - First, make a list of devices you want to use in your k3s cluster, their hardware types and the MAC addresses of their eth0 interface. (To find the MAC, boot any supported OS, perhaps the one that comes on the included SD card if you have one, and `cat /sys/class/net/eth0/address`. Or, just continue with a dummy config and the initial boot will say "there is no config for MAC xx:xx:xx:xx:xx:xx", and then you know what to call it.)
 - In the config/ directory, create one configuration file for each device, named as `{MAC}.yaml` (e.g. `dc:a6:32:aa:bb:cc.yaml`). The appropriate file will be used as a config.yaml eventually.
 - Run `./build-image.sh <imagetype>` where imagetype is `raspberrypi` or `orangepipc2`. It will check whether all dependencies are installed for creating the image, then proceeds to create the image as `picl-k3os-{k3osversion}-{imagetype}.img`.
+  - If you have multiple images, you can also run `./build-image.sh all` to build all supported image types in one go for convenience.
 - Write the image to the SD cards for each device. The SD card must be at least 1 GB.
 - Insert the SD cards into the devices, minding correct image type per device type, of course. On first boot, they will resize their root filesystems to the size of the SD card and will install their own config.yaml in the correct place based on their MAC address. After this, they will reboot.
 - On subsequent boots, k3os will run automatically with the correct per-device config.yaml.

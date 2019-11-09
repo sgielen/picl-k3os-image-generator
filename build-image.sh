@@ -43,11 +43,16 @@ if [ -z "$IMAGE_TYPE" ]; then
 	echo "Supported image types:" >&2
 	echo "  raspberrypi - Raspberry Pi model 3B+/4." >&2
 	echo "  orangepipc2 - Orange Pi PC 2" >&2
+	echo "  all         - Calls itself once for each supported image type" >&2
 	exit 1
 elif [ "$IMAGE_TYPE" = "raspberrypi" ]; then
 	echo "Building an image for the Raspberry Pi model 3B+/4."
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	echo "Building an image for the Orange Pi PC 2."
+elif [ "$IMAGE_TYPE" = "all" ]; then
+	$0 "raspberrypi"
+	$0 "orangepipc2"
+	exit 0
 else
 	echo "Unsupported image type \"$IMAGE_TYPE\"." >&2
 	exit 1
