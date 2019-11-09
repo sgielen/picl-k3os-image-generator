@@ -85,7 +85,7 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	fi
 fi
 
-dl_dep k3os-rootfs-arm64.tar.gz https://github.com/rancher/k3os/releases/download/v0.5.0/k3os-rootfs-arm64.tar.gz
+dl_dep k3os-rootfs-arm64.tar.gz https://github.com/rancher/k3os/releases/download/v0.6.0/k3os-rootfs-arm64.tar.gz
 
 # To find the URL for these packages:
 # - Go to https://launchpad.net/ubuntu/bionic/arm64/<package name>/
