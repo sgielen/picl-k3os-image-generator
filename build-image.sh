@@ -90,7 +90,7 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	fi
 fi
 
-dl_dep k3os-rootfs-arm64.tar.gz https://github.com/rancher/k3os/releases/download/v0.6.0/k3os-rootfs-arm64.tar.gz
+dl_dep k3os-rootfs-arm64.tar.gz https://github.com/rancher/k3os/releases/download/v0.9.0/k3os-rootfs-arm64.tar.gz
 
 # To find the URL for these packages:
 # - Go to https://launchpad.net/ubuntu/bionic/arm64/<package name>/
@@ -123,7 +123,7 @@ if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
 	# Create two partitions: boot and root.
 	BOOT_CAPACITY=60
 	# Initial root size. The partition will be resized to the SD card's maximum on first boot.
-	ROOT_CAPACITY=400
+	ROOT_CAPACITY=800
 	IMAGE_SIZE=$(($BOOT_CAPACITY + $ROOT_CAPACITY))
 
 	fallocate -l ${IMAGE_SIZE}M $IMAGE
@@ -135,7 +135,7 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	# Create a single partition; bootloader is copied from armbian
 	# at specific locations before the first partition. The partition
 	# will be resized to the SD card's maximum on first boot.
-	fallocate -l 250M $IMAGE
+	fallocate -l 600M $IMAGE
 	parted -s $IMAGE mklabel msdos
 	parted -s $IMAGE unit s mkpart primary 8192 100%
 
@@ -291,9 +291,8 @@ unpack_deb "util-linux-arm64.deb" "root-resize"
 sudo tar -cJf root/root-resize.tar.xz "root-resize"
 sudo rm -rf root-resize
 
-## Write a resizing init and an actual init
-sudo rm root/sbin/init
-sudo install -m 0755 -o root -g root init init.resizefs root/sbin
+## Write a resizing init and a pre-init
+sudo install -m 0755 -o root -g root init.preinit init.resizefs root/sbin
 sudo sed -i "s#@IMAGE_TYPE@#$IMAGE_TYPE#" root/sbin/init.resizefs
 
 ## Clean up

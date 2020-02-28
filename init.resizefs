@@ -39,12 +39,12 @@ sleep 5
 echo "== Setting proper init... =="
 if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
 	mount ${ROOTDISK}p1 /boot
-	sed -i 's# init=/sbin/init.resizefs##' /boot/cmdline.txt
+	sed -i 's# init=/sbin/init.resizefs# init=/sbin/init.preinit#' /boot/cmdline.txt
 	NEW_PARTUUID=$(blkid -o export $ROOTDEVICE | grep PARTUUID)
 	sed -i "s# root=PARTUUID=$PARTUUID # root=$NEW_PARTUUID #" /boot/cmdline.txt
 	umount /boot
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
-	sed -i 's# init=/sbin/init.resizefs##' /boot/env.txt
+	sed -i 's# init=/sbin/init.resizefs# init=/sbin/init.preinit#' /boot/env.txt
 fi
 
 echo "== Linking correct config... =="

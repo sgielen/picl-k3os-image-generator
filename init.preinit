@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+# sleep a second for devices to settle
+sleep 1
+
+# if an alternative init exists, exec it first. This is useful for future
+# updates, as the file you're reading right now is inaccessible after k3os
+# boots.
+if [ -x "/k3os/system/init.preinit" ]; then
+	exec /k3os/system/init.preinit
+fi
+
+modprobe squashfs || true
+exec /sbin/init
