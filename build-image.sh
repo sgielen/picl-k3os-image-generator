@@ -114,6 +114,7 @@ dl_dep libselinux1-arm64.deb https://launchpadlibrarian.net/359065467/libselinux
 dl_dep libudev1-arm64.deb https://launchpadlibrarian.net/444834685/libudev1_237-3ubuntu10.31_arm64.deb
 dl_dep libpcre3-arm64.deb https://launchpadlibrarian.net/355683636/libpcre3_8.39-9_arm64.deb
 dl_dep util-linux-arm64.deb https://launchpadlibrarian.net/438655410/util-linux_2.31.1-0.4ubuntu3.4_arm64.deb
+dl_dep rpi-firmware-nonfree-master.zip https://github.com/RPi-Distro/firmware-nonfree/archive/master.zip
 
 ## Make the image (capacity in MB, not MiB)
 echo "== Making image and filesystems... =="
@@ -267,6 +268,13 @@ if [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	sudo ln -s $(cd root/boot; ls -d dtb-*-sunxi64 | head -n1) root/boot/dtb
 	unpack_deb "linux-image-dev-sunxi64.deb" "root"
 	sudo ln -s $(cd root/boot; ls -d vmlinuz-*-sunxi64 | head -n1) root/boot/Image
+elif [ "$IMAGE_TYPE" = "raspberrypi" ]; then
+  BRCMTMP=$(mktemp -d)
+  7z e -y deps/rpi-firmware-nonfree-master.zip -o"$BRCMTMP" "firmware-nonfree-master/brcm/*" > /dev/null
+  sudo mkdir -p root/lib/firmware/brcm/
+  sudo cp "$BRCMTMP"/brcmfmac43455* root/lib/firmware/brcm/
+  sudo cp "$BRCMTMP"/brcmfmac43430* root/lib/firmware/brcm/
+  rm -rf "$BRCMTMP"
 fi
 
 ## Add tarball for the libraries and binaries needed to resize root FS
