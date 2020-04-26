@@ -77,15 +77,18 @@ mkdir -p deps
 if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
 	dl_dep raspberrypi-firmware.tar.gz https://github.com/raspberrypi/firmware/archive/1.20190925.tar.gz
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
-	dl_dep linux-dtb-dev-sunxi64.deb https://apt.armbian.com/pool/main/l/linux-5.3.7-sunxi64/linux-dtb-dev-sunxi64_5.99.191031_arm64.deb
-	dl_dep linux-image-dev-sunxi64.deb https://apt.armbian.com/pool/main/l/linux-5.3.7-sunxi64/linux-image-dev-sunxi64_5.99.191031_arm64.deb
+	# TODO: apt.armbian.com removes old versions, so these URLs become
+	# outdated. Find an armbian mirror that keeps old versions so that
+	# the URLs remain functional.
+	dl_dep linux-dtb-dev-sunxi64.deb https://apt.armbian.com/pool/main/l/linux-5.4.2-sunxi64/linux-dtb-dev-sunxi64_19.11.3.348_arm64.deb
+	dl_dep linux-image-dev-sunxi64.deb https://apt.armbian.com/pool/main/l/linux-5.4.2-sunxi64/linux-image-dev-sunxi64_19.11.3.348_arm64.deb
 
 	if [ ! -f "deps/armbian_orangepipc2.img" ]; then
 		pushd deps
-		wget https://dl.armbian.com/orangepipc2/Debian_buster_next.7z
-		7z x Debian_buster_next.7z \*.img
-		dd of=armbian_orangepipc2.img bs=1024 count=4096 < Armbian_*_Orangepipc2_Debian_buster_next_*.img
-		rm Armbian_*_Orangepipc2_Debian_buster_next_*.img Debian_buster_next.7z
+		wget -O Armbian_orangepipc2_buster_current.7z https://dl.armbian.com/orangepipc2/archive/Armbian_19.11.3_Orangepipc2_buster_current_5.3.9.7z
+		7z x Armbian_orangepipc2_buster_current.7z \*.img
+		dd of=armbian_orangepipc2.img bs=1024 count=4096 < Armbian_*_Orangepipc2_buster_current_*.img
+		rm Armbian_*_Orangepipc2_buster_current_*.img Armbian_orangepipc2_buster_current.7z
 		popd
 	fi
 fi
