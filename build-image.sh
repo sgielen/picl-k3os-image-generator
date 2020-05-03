@@ -75,7 +75,7 @@ function dl_dep() {
 mkdir -p deps
 
 if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
-	dl_dep raspberrypi-firmware.tar.gz https://github.com/raspberrypi/firmware/archive/1.20190925.tar.gz
+	dl_dep raspberrypi-firmware.tar.gz https://github.com/raspberrypi/firmware/archive/1.20200212.tar.gz
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	# TODO: apt.armbian.com removes old versions, so these URLs become
 	# outdated. Find an armbian mirror that keeps old versions so that
