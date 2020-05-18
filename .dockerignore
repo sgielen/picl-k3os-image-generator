@@ -1,0 +1,10 @@
+.gitattributes
+.gitignore
+.gitmodules
+.git
+.idea
+.DS_Store
+.dockerignore
+docker-k3os-image-gen
+dockerfile
+

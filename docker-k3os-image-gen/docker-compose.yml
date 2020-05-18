@@ -1,0 +1,33 @@
+version: "3"
+services:
+  rpi-image-gen:
+    build: ../
+    environment:
+      TARGET: raspberrypi
+    volumes:
+      # bind ../config to our working dir config
+      # this ONLY works with unnamed volumes like below!!
+      - ../config:/usr/src/app/config
+      # result is in this named volume
+      - "images:/usr/src/app/images"
+      # this is the downloads cache
+      - "k3os-fw:/usr/src/app/deps"
+      # this is needed for loopback devices
+      - /dev:/dev
+    privileged: true
+    devices:
+      - "/dev:/dev"
+    cap_add:
+      - CAP_MKNOD
+volumes:
+   k3os-fw:
+     driver: local
+   images:
+     # OSX only!! if we add this the below path under device is where the volume will reside actually on OSX
+     # otherwise it is in the docker for OSX vm, where we have ONLY indirect access via other containers or command line ...
+     driver: local
+     driver_opts:
+       type: none
+       o: bind
+       device: "${PWD}/images"
+

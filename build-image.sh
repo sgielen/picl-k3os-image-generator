@@ -148,15 +148,22 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 fi
 
 LODEV=`sudo losetup --show -f $IMAGE`
-sudo kpartx -a $LODEV
+echo $LODEV
+
+#sudo kpartx -a $LODEV
+partprobe -s $LODEV
 sleep 1
 
+echo " ---- /proc/partitions ----"
+cat /proc/partitions | grep loop
+ls -al /dev/loop*
+
 if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
-	LODEV_BOOT=/dev/mapper/`basename ${LODEV}`p1
-	LODEV_ROOT=/dev/mapper/`basename ${LODEV}`p2
-	sudo mkfs.fat $LODEV_BOOT
+	LODEV_BOOT=${LODEV}p1
+	LODEV_ROOT=${LODEV}p2
+  sudo mkfs.fat $LODEV_BOOT
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
-	LODEV_ROOT=/dev/mapper/`basename ${LODEV}`p1
+  LODEV_ROOT=${LODEV}p1
 fi
 
 sudo mkfs.ext4 -F $LODEV_ROOT
@@ -317,11 +324,12 @@ sudo umount root
 rmdir root
 sync
 sleep 1
-sudo kpartx -d $LODEV
+# sudo kpartx -d $LODEV
 sleep 1
 sudo losetup -d $LODEV
 
-IMAGE_FINAL=picl-k3os-${K3OS_VERSION}-${IMAGE_TYPE}.img
+mkdir -p images
+IMAGE_FINAL=images/picl-k3os-${K3OS_VERSION}-${IMAGE_TYPE}.img
 mv $IMAGE $IMAGE_FINAL
 echo ""
 echo "== $IMAGE_FINAL created. =="

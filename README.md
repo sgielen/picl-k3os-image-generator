@@ -49,6 +49,11 @@ the normal init script and try to start k3os manually. You may need to load addi
 
 Anytime you think the scripts or documentation could be improved, please file an issue or a PR and we'll be happy to help.
 
+## Docker
+If you want to build in Docker for Mac you can use the `docker-compose.yml` in the `docker-k3os-image-gen directory`.
+The `images` subdirectory will contain the resulting image. The `<imagetype>` is set via the `TARGET` envirnonment in the `docker-compose.yml` file.
+The `config` directory is used in the same way as described above.
+
 ## Authors & License
 
 This code was written by Dennis Brentjes and Sjors Gielen. Contributions welcome!

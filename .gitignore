@@ -3,3 +3,4 @@ picl-k3os-*.img
 deps
 boot
 root
+.idea
