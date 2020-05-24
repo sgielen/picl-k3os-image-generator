@@ -18,6 +18,37 @@ assert_tool() {
 	fi
 }
 
+get_pifirmware() {
+    #  Uses RASPBERRY_PI_FIRMWARE env variable to allow the user to control which pi firmware version to use.
+    # - 1. unset, in which case it is initialized to a known good version (DEFAULT_GOOD_PI_VERSION)
+    # - 2. set to "latest" in which case it pulls the latest firmware from git repo.
+    # - 3. set by the user to desired version
+
+    # Set this to default to a KNOWN GOOD pi firmware (e.g. 1.20200212); this is used if RASPBERRY_PI_FIRMWARE env variable is not specified
+    DEFAULT_GOOD_PI_VERSION="1.20200212"
+
+    if [ -z "${RASPBERRY_PI_FIRMWARE}" ]; then
+        echo "RASPBERRY_PI_FIRMWARE env variable was not set - defaulting to known good firmware [${DEFAULT_GOOD_PI_VERSION}]"
+        dl_dep raspberrypi-firmware.tar.gz https://github.com/raspberrypi/firmware/archive/"${DEFAULT_GOOD_PI_VERSION}".tar.gz
+    elif [ "${RASPBERRY_PI_FIRMWARE}" = "latest" ]; then
+        echo "RASPBERRY_PI_FIRMWARE env variable set to 'latest' - using latest pi firmware release"
+        dl_dep raspberrypi-firmware.tar.gz "$(wget -qO - https://api.github.com/repos/raspberrypi/firmware/tags | jq -r '.[0].tarball_url')"
+    else
+        # set to requested version, but first check if it is a valid version
+        for i in $(wget -qO - https://api.github.com/repos/raspberrypi/firmware/tags | jq  --arg RASPBERRY_PI_FIRMWARE "${RASPBERRY_PI_FIRMWARE}" -r '.[].tarball_url | contains($RASPBERRY_PI_FIRMWARE)')
+        do
+            if [ "$i" = "true" ]; then FOUND=true; break; fi
+        done
+        if [ "${FOUND}" = true ]; then
+            echo "RASPBERRY_PI_FIRMWARE env variable set to [${RASPBERRY_PI_FIRMWARE}] - will use this firmware."
+            dl_dep raspberrypi-firmware.tar.gz https://github.com/raspberrypi/firmware/archive/"${RASPBERRY_PI_FIRMWARE}".tar.gz
+        else
+            echo "Requested raspberry pi firmware [${RASPBERRY_PI_FIRMWARE}] is not valid (does not exist in pi firmware repo)! Exiting Build!"
+            exit 1;
+        fi
+    fi
+}
+
 assert_tool wget
 assert_tool mktemp
 assert_tool fallocate
@@ -34,6 +65,7 @@ assert_tool blkid
 assert_tool realpath
 assert_tool 7z
 assert_tool dd
+assert_tool jq
 
 ## Check if we are building a supported image
 IMAGE_TYPE=$1
@@ -75,7 +107,7 @@ function dl_dep() {
 mkdir -p deps
 
 if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
-	dl_dep raspberrypi-firmware.tar.gz https://github.com/raspberrypi/firmware/archive/1.20200212.tar.gz
+	get_pifirmware
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	# TODO: apt.armbian.com removes old versions, so these URLs become
 	# outdated. Find an armbian mirror that keeps old versions so that
