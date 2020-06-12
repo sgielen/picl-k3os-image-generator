@@ -70,7 +70,7 @@ assert_tool jq
 ## Check if we are building a supported image
 IMAGE_TYPE=$1
 
-if [ -z "$IMAGE_TYPE" ]; then
+if [ -z "$IMAGE_TYPE" -o "$IMAGE_TYPE" = "help" -o "$IMAGE_TYPE" = "--help" -o "$IMAGE_TYPE" = "-h" ]; then
 	echo "Usage: $0 <image type>" >&2
 	echo "Supported image types:" >&2
 	echo "  raspberrypi - Raspberry Pi model 3B+/4." >&2
@@ -86,7 +86,7 @@ elif [ "$IMAGE_TYPE" = "all" ]; then
 	$0 "orangepipc2"
 	exit 0
 else
-	echo "Unsupported image type \"$IMAGE_TYPE\"." >&2
+	echo "Unsupported image type \"$IMAGE_TYPE\". See \"$0 help\" for more information." >&2
 	exit 1
 fi
 
