@@ -232,11 +232,11 @@ kernel=kernel8.img
 [all]
 EOF
 	PARTUUID=$(sudo blkid -o export $LODEV_ROOT | grep PARTUUID)
-	echo "dwc_otg.lpm_enable=0 root=$PARTUUID rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait init=/sbin/init.resizefs" | sudo tee boot/cmdline.txt >/dev/null
+	echo "dwc_otg.lpm_enable=0 root=$PARTUUID rootfstype=ext4 elevator=deadline rootwait init=/sbin/init.resizefs ro" | sudo tee boot/cmdline.txt >/dev/null
 	sudo rm -rf $PITEMP
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	cat <<EOF | sudo tee root/boot/env.txt >/dev/null
-extraargs=elevator=deadline init=/sbin/init.resizefs
+extraargs=elevator=deadline rootwait init=/sbin/init.resizefs ro
 EOF
 	sudo install -m 0644 -o root -g root orangepipc2-boot.cmd root/boot/boot.cmd
 	sudo mkimage -C none -A arm -T script -d root/boot/boot.cmd root/boot/boot.scr
@@ -313,15 +313,17 @@ elif [ "$IMAGE_TYPE" = "raspberrypi" ]; then
   rm -rf "$BRCMTMP"
 fi
 
-## Add tarball for the libraries and binaries needed to resize root FS
-mkdir root-resize
-unpack_deb "libcom-err2-arm64.deb" "root-resize"
-unpack_deb "libblkid1-arm64.deb" "root-resize"
-unpack_deb "libuuid1-arm64.deb" "root-resize"
-unpack_deb "libext2fs2-arm64.deb" "root-resize"
-unpack_deb "e2fsprogs-arm64.deb" "root-resize"
+## Add libraries and binaries needed to resize root FS & fsck every boot
+unpack_deb "libcom-err2-arm64.deb" "root"
+unpack_deb "libblkid1-arm64.deb" "root"
+unpack_deb "libuuid1-arm64.deb" "root"
+unpack_deb "libext2fs2-arm64.deb" "root"
+unpack_deb "e2fsprogs-arm64.deb" "root"
+unpack_deb "util-linux-arm64.deb" "root"
 
+## Add tarball for the libraries and binaries needed only to resize root FS
 # TODO: replace parted by fdisk/sfdisk if simpler?
+mkdir root-resize
 unpack_deb "parted-arm64.deb" "root-resize"
 unpack_deb "libparted2-arm64.deb" "root-resize"
 unpack_deb "libreadline7-arm64.deb" "root-resize"
@@ -331,13 +333,12 @@ unpack_deb "libselinux1-arm64.deb" "root-resize"
 unpack_deb "libudev1-arm64.deb" "root-resize"
 unpack_deb "libpcre3-arm64.deb" "root-resize"
 
-unpack_deb "util-linux-arm64.deb" "root-resize"
 sudo tar -cJf root/root-resize.tar.xz "root-resize"
 sudo rm -rf root-resize
 
 ## Write a resizing init and a pre-init
 sudo install -m 0755 -o root -g root init.preinit init.resizefs root/sbin
-sudo sed -i "s#@IMAGE_TYPE@#$IMAGE_TYPE#" root/sbin/init.resizefs
+sudo sed -i "s#@IMAGE_TYPE@#$IMAGE_TYPE#" root/sbin/init.resizefs root/sbin/init.preinit
 
 ## Clean up
 sync
