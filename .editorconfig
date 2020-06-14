@@ -1,0 +1,18 @@
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 1
+indent_style = tab
+insert_final_newline = false
+max_line_length = 120
+tab_width = 2
+
+
+[{*.bash,*.sh,*.zsh}]
+indent_size = 1
+tab_width = 2
+
+
+[{*.yaml,*.yml,.clang-format}]
+indent_size = 2
+indent_style = space

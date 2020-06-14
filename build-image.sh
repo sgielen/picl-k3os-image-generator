@@ -87,7 +87,7 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 		pushd deps
 		wget -O Armbian_orangepipc2_buster_current.7z https://dl.armbian.com/orangepipc2/archive/Armbian_19.11.3_Orangepipc2_buster_current_5.3.9.7z
 		7z x Armbian_orangepipc2_buster_current.7z \*.img
-		dd of=armbian_orangepipc2.img bs=1024 count=4096 < Armbian_*_Orangepipc2_buster_current_*.img
+		dd of=armbian_orangepipc2.img bs=1024 count=4096 <Armbian_*_Orangepipc2_buster_current_*.img
 		rm Armbian_*_Orangepipc2_buster_current_*.img Armbian_orangepipc2_buster_current.7z
 		popd
 	fi
@@ -133,7 +133,7 @@ if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
 	fallocate -l ${IMAGE_SIZE}M $IMAGE
 	parted -s $IMAGE mklabel msdos
 	parted -s $IMAGE unit MB mkpart primary fat32 1 $BOOT_CAPACITY
-	parted -s $IMAGE unit MB mkpart primary $(($BOOT_CAPACITY+1)) $IMAGE_SIZE
+	parted -s $IMAGE unit MB mkpart primary $(($BOOT_CAPACITY + 1)) $IMAGE_SIZE
 	parted -s $IMAGE set 1 boot on
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	# Create a single partition; bootloader is copied from armbian
@@ -147,23 +147,16 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	dd if=deps/armbian_orangepipc2.img of=$IMAGE bs=512 skip=1 seek=1 count=8191 conv=notrunc
 fi
 
-LODEV=`sudo losetup --show -f $IMAGE`
-echo $LODEV
-
-#sudo kpartx -a $LODEV
+LODEV=$(sudo losetup --show -f $IMAGE)
 partprobe -s $LODEV
 sleep 1
-
-echo " ---- /proc/partitions ----"
-cat /proc/partitions | grep loop
-ls -al /dev/loop*
 
 if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
 	LODEV_BOOT=${LODEV}p1
 	LODEV_ROOT=${LODEV}p2
-  sudo mkfs.fat $LODEV_BOOT
+	sudo mkfs.fat $LODEV_BOOT
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
-  LODEV_ROOT=${LODEV}p1
+	LODEV_ROOT=${LODEV}p1
 fi
 
 sudo mkfs.ext4 -F $LODEV_ROOT
@@ -222,7 +215,7 @@ echo "== Installing... =="
 sudo tar -xf deps/k3os-rootfs-arm64.tar.gz --strip 1 -C root
 # config.yaml will be created by init.resizefs based on MAC of eth0
 sudo cp -R config root/k3os/system
-for filename in root/k3os/system/config/*.*; do [ "$filename" != "${filename,,}" ] && sudo mv "$filename" "${filename,,}" ; done 
+for filename in root/k3os/system/config/*.*; do [ "$filename" != "${filename,,}" ] && sudo mv "$filename" "${filename,,}"; done
 K3OS_VERSION=$(ls --indicator-style=none root/k3os/system/k3os | grep -v current | head -n1)
 
 ## Install busybox
@@ -269,23 +262,28 @@ for i in \
 	touch \
 	umount \
 	uname \
-	wget \
-; do
+	wget; do
 	sudo ln -s busybox root/bin/$i
 done
 
 if [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	unpack_deb "linux-dtb-dev-sunxi64.deb" "root"
-	sudo ln -s $(cd root/boot; ls -d dtb-*-sunxi64 | head -n1) root/boot/dtb
+	sudo ln -s $(
+		cd root/boot
+		ls -d dtb-*-sunxi64 | head -n1
+	) root/boot/dtb
 	unpack_deb "linux-image-dev-sunxi64.deb" "root"
-	sudo ln -s $(cd root/boot; ls -d vmlinuz-*-sunxi64 | head -n1) root/boot/Image
+	sudo ln -s $(
+		cd root/boot
+		ls -d vmlinuz-*-sunxi64 | head -n1
+	) root/boot/Image
 elif [ "$IMAGE_TYPE" = "raspberrypi" ]; then
-  BRCMTMP=$(mktemp -d)
-  7z e -y deps/rpi-firmware-nonfree-master.zip -o"$BRCMTMP" "firmware-nonfree-master/brcm/*" > /dev/null
-  sudo mkdir -p root/lib/firmware/brcm/
-  sudo cp "$BRCMTMP"/brcmfmac43455* root/lib/firmware/brcm/
-  sudo cp "$BRCMTMP"/brcmfmac43430* root/lib/firmware/brcm/
-  rm -rf "$BRCMTMP"
+	BRCMTMP=$(mktemp -d)
+	7z e -y deps/rpi-firmware-nonfree-master.zip -o"$BRCMTMP" "firmware-nonfree-master/brcm/*" >/dev/null
+	sudo mkdir -p root/lib/firmware/brcm/
+	sudo cp "$BRCMTMP"/brcmfmac43455* root/lib/firmware/brcm/
+	sudo cp "$BRCMTMP"/brcmfmac43430* root/lib/firmware/brcm/
+	rm -rf "$BRCMTMP"
 fi
 
 ## Add tarball for the libraries and binaries needed to resize root FS
@@ -323,8 +321,6 @@ fi
 sudo umount root
 rmdir root
 sync
-sleep 1
-# sudo kpartx -d $LODEV
 sleep 1
 sudo losetup -d $LODEV
 

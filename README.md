@@ -51,7 +51,7 @@ Anytime you think the scripts or documentation could be improved, please file an
 
 ## Docker
 If you want to build in Docker for Mac you can use the `docker-compose.yml` in the `docker-k3os-image-gen directory`.
-The `images` subdirectory will contain the resulting image. The `<imagetype>` is set via the `TARGET` envirnonment in the `docker-compose.yml` file.
+The `images` subdirectory will contain the resulting image. The `<imagetype>` is set via the `TARGET` environment in the `docker-compose.yml` file.
 The `config` directory is used in the same way as described above.
 
 ## Authors & License
