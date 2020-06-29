@@ -53,7 +53,7 @@ assert_tool wget
 assert_tool mktemp
 assert_tool fallocate
 assert_tool parted
-assert_tool kpartx
+assert_tool partprobe
 assert_tool losetup
 assert_tool mkfs.fat
 assert_tool mkfs.ext4
@@ -180,15 +180,15 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 fi
 
 LODEV=`sudo losetup --show -f $IMAGE`
-sudo kpartx -a $LODEV
+sudo partprobe -s $LODEV
 sleep 1
 
 if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
-	LODEV_BOOT=/dev/mapper/`basename ${LODEV}`p1
-	LODEV_ROOT=/dev/mapper/`basename ${LODEV}`p2
+	LODEV_BOOT=${LODEV}p1
+	LODEV_ROOT=${LODEV}p2
 	sudo mkfs.fat $LODEV_BOOT
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
-	LODEV_ROOT=/dev/mapper/`basename ${LODEV}`p1
+	LODEV_ROOT=${LODEV}p1
 fi
 
 sudo mkfs.ext4 -F $LODEV_ROOT
@@ -349,8 +349,6 @@ fi
 sudo umount root
 rmdir root
 sync
-sleep 1
-sudo kpartx -d $LODEV
 sleep 1
 sudo losetup -d $LODEV
 
