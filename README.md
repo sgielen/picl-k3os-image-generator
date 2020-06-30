@@ -53,6 +53,25 @@ the normal init script and try to start k3os manually. You may need to load addi
 
 Anytime you think the scripts or documentation could be improved, please file an issue or a PR and we'll be happy to help.
 
+## Docker
+
+You can build this project in Docker, e.g. when you'd rather not install dependencies on your host machine or when you're
+building on a Mac.
+
+If you want to build in Docker, you can build a container containing the dependencies using:
+
+```
+docker build . -t picl-builder:latest
+```
+
+Then, run the container using:
+
+```
+docker run -e TARGET=all -v $(realpath .):/app -v /dev:/dev --privileged picl-builder:latest
+```
+
+The images will be written into your local directory once the container is done.
+
 ## Authors & License
 
 This code was written by Dennis Brentjes and Sjors Gielen. Contributions welcome!
