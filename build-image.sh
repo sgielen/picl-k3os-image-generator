@@ -51,7 +51,7 @@ get_pifirmware() {
 
 assert_tool wget
 assert_tool mktemp
-assert_tool fallocate
+assert_tool truncate
 assert_tool parted
 assert_tool partprobe
 assert_tool losetup
@@ -162,7 +162,7 @@ if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
 	ROOT_CAPACITY=800
 	IMAGE_SIZE=$(($BOOT_CAPACITY + $ROOT_CAPACITY))
 
-	fallocate -l ${IMAGE_SIZE}M $IMAGE
+	truncate -s ${IMAGE_SIZE}M $IMAGE
 	parted -s $IMAGE mklabel msdos
 	parted -s $IMAGE unit MB mkpart primary fat32 1 $BOOT_CAPACITY
 	parted -s $IMAGE unit MB mkpart primary $(($BOOT_CAPACITY+1)) $IMAGE_SIZE
@@ -171,7 +171,7 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	# Create a single partition; bootloader is copied from armbian
 	# at specific locations before the first partition. The partition
 	# will be resized to the SD card's maximum on first boot.
-	fallocate -l 600M $IMAGE
+	truncate -s 600M $IMAGE
 	parted -s $IMAGE mklabel msdos
 	parted -s $IMAGE unit s mkpart primary 8192 100%
 
