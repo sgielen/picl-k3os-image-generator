@@ -339,6 +339,8 @@ sudo rm -rf root-resize
 ## Write a resizing init and a pre-init
 sudo install -m 0755 -o root -g root init.preinit init.resizefs root/sbin
 sudo sed -i "s#@IMAGE_TYPE@#$IMAGE_TYPE#" root/sbin/init.resizefs root/sbin/init.preinit
+# Remove DOS line endings in case the repo was checked out on Windows, fixes ENOENT of the shell in shebang line
+sudo sed -i "s#\r##" root/sbin/init.resizefs root/sbin/init.preinit
 
 ## Clean up
 sync
