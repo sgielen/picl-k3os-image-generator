@@ -58,16 +58,10 @@ Anytime you think the scripts or documentation could be improved, please file an
 You can build this project in Docker, e.g. when you'd rather not install dependencies on your host machine or when you're
 building on a Mac or Windows.
 
-If you want to build in Docker, you can build a container containing the dependencies using:
+Run the container using:
 
 ```
-docker build . -t picl-builder:latest
-```
-
-Then, run the container using:
-
-```
-docker run -e TARGET=all -v ${PWD}:/app -v /dev:/dev --privileged picl-builder:latest
+docker run -e TARGET=raspberrypi -v $PWD/config:/app/config -v $PWD/deps:/app/deps -v $PWD/out:/app/out -v /dev:/dev --privileged elmariofredo/picl-k3os-image-generator:v0.2
 ```
 
 The images will be written into your local directory once the container is done.

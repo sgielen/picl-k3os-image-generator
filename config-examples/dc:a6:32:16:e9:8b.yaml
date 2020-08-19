@@ -1,9 +1,0 @@
-# n1
-ssh_authorized_keys:
-- ssh-rsa AAAAB3N...
-hostname: n1
-k3os:
-  ntp_servers:
-  - NTP_SERVER_IP_OR_HOSTNAME
-  k3s_args:
-  - server

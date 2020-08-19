@@ -361,7 +361,7 @@ sync
 sleep 1
 sudo losetup -d $LODEV
 
-IMAGE_FINAL=picl-k3os-${K3OS_VERSION}-${IMAGE_TYPE}.img
+IMAGE_FINAL=out/picl-k3os-${K3OS_VERSION}-${IMAGE_TYPE}.img
 mv $IMAGE $IMAGE_FINAL
 echo ""
 echo "== $IMAGE_FINAL created. =="
