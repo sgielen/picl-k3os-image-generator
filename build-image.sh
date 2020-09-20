@@ -66,7 +66,6 @@ assert_tool e2label
 assert_tool mktemp
 assert_tool ar
 assert_tool blkid
-assert_tool realpath
 assert_tool 7z
 assert_tool dd
 assert_tool jq
