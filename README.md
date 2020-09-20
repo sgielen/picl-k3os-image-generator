@@ -74,6 +74,8 @@ The images will be written into your local directory once the container is done.
 
 ## Authors & License
 
-This code was written by Dennis Brentjes and Sjors Gielen. Contributions welcome!
+The initial code was written by Dennis Brentjes and Sjors Gielen, with many
+[contributors since then](https://github.com/sgielen/picl-k3os-image-generator/graphs/contributors),
+thanks to all. Further contributions welcome!
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
