@@ -56,7 +56,7 @@ Anytime you think the scripts or documentation could be improved, please file an
 ## Docker
 
 You can build this project in Docker, e.g. when you'd rather not install dependencies on your host machine or when you're
-building on a Mac.
+building on a Mac or Windows.
 
 If you want to build in Docker, you can build a container containing the dependencies using:
 
