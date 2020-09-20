@@ -1,0 +1,11 @@
+# n3
+ssh_authorized_keys:
+- ssh-rsa AAAAB3N...
+hostname: n3
+k3os:
+  ntp_servers:
+  - NTP_SERVER_IP_OR_HOSTNAME
+  k3s_args:
+  - agent
+  token: MASTER_TOKEN
+  server_url: https://MASTER_IP:6443

@@ -67,7 +67,7 @@ docker build . -t picl-builder:latest
 Then, run the container using:
 
 ```
-docker run -e TARGET=all -v $(realpath .):/app -v /dev:/dev --privileged picl-builder:latest
+docker run -e TARGET=all -v ${PWD}:/app -v /dev:/dev --privileged picl-builder:latest
 ```
 
 The images will be written into your local directory once the container is done.
