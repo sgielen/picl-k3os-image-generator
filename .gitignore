@@ -1,5 +1,5 @@
 config/*.yaml
-picl-k3os-*.img
+out/*.img
 deps
 boot
 root
