@@ -66,7 +66,8 @@ assert_tool e2label
 assert_tool mktemp
 assert_tool ar
 assert_tool blkid
-assert_tool 7z
+assert_tool unxz
+assert_tool udevadm
 assert_tool dd
 assert_tool jq
 
@@ -115,15 +116,15 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	# TODO: apt.armbian.com removes old versions, so these URLs become
 	# outdated. Find an armbian mirror that keeps old versions so that
 	# the URLs remain functional.
-	dl_dep linux-dtb-dev-sunxi64.deb https://apt.armbian.com/pool/main/l/linux-5.4.2-sunxi64/linux-dtb-dev-sunxi64_19.11.3.348_arm64.deb
-	dl_dep linux-image-dev-sunxi64.deb https://apt.armbian.com/pool/main/l/linux-5.4.2-sunxi64/linux-image-dev-sunxi64_19.11.3.348_arm64.deb
+	dl_dep linux-dtb-dev-sunxi64.deb https://apt.armbian.com/pool/main/l/linux-5.9.14-sunxi64/linux-dtb-current-sunxi64_20.11.3_arm64.deb
+	dl_dep linux-image-dev-sunxi64.deb https://apt.armbian.com/pool/main/l/linux-5.9.14-sunxi64/linux-image-current-sunxi64_20.11.3_arm64.deb
 
 	if [ ! -f "deps/armbian_orangepipc2.img" ]; then
 		pushd deps
-		wget -O Armbian_orangepipc2_buster_current.7z https://dl.armbian.com/orangepipc2/archive/Armbian_19.11.3_Orangepipc2_buster_current_5.3.9.7z
-		7z x Armbian_orangepipc2_buster_current.7z \*.img
-		dd of=armbian_orangepipc2.img bs=1024 count=4096 < Armbian_*_Orangepipc2_buster_current_*.img
-		rm Armbian_*_Orangepipc2_buster_current_*.img Armbian_orangepipc2_buster_current.7z
+		wget -O Armbian_orangepipc2_buster_current.img.xz https://armbian.tnahosting.net/dl/orangepipc2/archive/Armbian_20.11.3_Orangepipc2_buster_current_5.9.14.img.xz
+		unxz Armbian_orangepipc2_buster_current.img.xz
+		dd of=armbian_orangepipc2.img bs=1024 count=4096 < Armbian_orangepipc2_buster_current.img
+		rm Armbian_orangepipc2_buster_current.img
 		popd
 	fi
 fi
@@ -180,7 +181,7 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	# Create a single partition; bootloader is copied from armbian
 	# at specific locations before the first partition. The partition
 	# will be resized to the SD card's maximum on first boot.
-	truncate -s 600M $IMAGE
+	truncate -s 800M $IMAGE
 	parted -s $IMAGE mklabel msdos
 	parted -s $IMAGE unit s mkpart primary 8192 100%
 
@@ -308,6 +309,7 @@ for i in \
 	sudo ln -s busybox root/bin/$i
 done
 
+echo "=== Unpacking firmware/image... ==="
 if [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	unpack_deb "linux-dtb-dev-sunxi64.deb" "root"
 	sudo ln -s $(cd root/boot; ls -d dtb-*-sunxi64 | head -n1) root/boot/dtb
@@ -323,6 +325,7 @@ elif [ "$IMAGE_TYPE" = "raspberrypi" ]; then
 fi
 
 ## Add libraries and binaries needed to resize root FS & fsck every boot
+echo "=== Unpacking libs ... ==="
 unpack_deb "libcom-err2-arm64.deb" "root"
 unpack_deb "libblkid1-arm64.deb" "root"
 unpack_deb "libuuid1-arm64.deb" "root"
@@ -332,6 +335,7 @@ unpack_deb "util-linux-arm64.deb" "root"
 
 ## Add tarball for the libraries and binaries needed only to resize root FS
 # TODO: replace parted by fdisk/sfdisk if simpler?
+echo "=== Unpacking resize libs ... ==="
 mkdir root-resize
 unpack_deb "parted-arm64.deb" "root-resize"
 unpack_deb "libparted2-arm64.deb" "root-resize"
@@ -350,6 +354,7 @@ sudo install -m 0755 -o root -g root init.preinit init.resizefs root/sbin
 sudo sed -i "s#@IMAGE_TYPE@#$IMAGE_TYPE#" root/sbin/init.resizefs root/sbin/init.preinit
 
 ## Clean up
+echo "=== Cleaning up ... ==="
 sync
 if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
 	sudo umount boot
