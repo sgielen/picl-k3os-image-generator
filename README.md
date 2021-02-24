@@ -20,6 +20,7 @@ This project can be used to generate images for k3os compatible with various arm
 - Write the image to the SD cards for each device. The SD card must be at least 1 GB.
 - Insert the SD cards into the devices, minding correct image type per device type, of course. On first boot, they will resize their root filesystems to the size of the SD card and will install their own config.yaml in the correct place based on their MAC address. After this, they will reboot.
 - On subsequent boots, k3os will run automatically with the correct per-device config.yaml.
+- If you want to force downloads of cached files, e.g. to update dependecies use `export FORCE_DOWNLOAD=true`
 
 ## Performing updates
 
