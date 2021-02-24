@@ -4,10 +4,13 @@ set -e
 
 
 # Set this to default to a KNOWN GOOD pi firmware (e.g. 1.20200811); this is used if RASPBERRY_PI_FIRMWARE env variable is not specified
-DEFAULT_GOOD_PI_VERSION="1.20200811"
+DEFAULT_GOOD_PI_VERSION="1.20210201"
 
-# Set this to default to a KNOWN GOOD k3os (e.g. v0.11.0); this is used if K3OS_VERSION env variable is not specified
-DEFAULT_GOOD_K3OS_VERSION="v0.11.0"
+# Set this to default to a KNOWN GOOD k3os (e.g. v0.11.1); this is used if K3OS_VERSION env variable is not specified
+DEFAULT_GOOD_K3OS_VERSION="v0.11.1"
+
+# Set this if you want to force downloads of cached files, e.g. to update dependecies use 
+FORCE_DOWNLOAD="false"
 
 ## Check if we have any configs
 if [ -z "$(ls config/*.yaml)" ]; then
@@ -51,6 +54,9 @@ get_pifirmware() {
             exit 1;
         fi
     fi
+
+	# Download non free Firmware parts
+	dl_dep rpi-firmware-nonfree-master.zip https://github.com/RPi-Distro/firmware-nonfree/archive/master.zip
 }
 
 assert_tool wget
@@ -101,9 +107,13 @@ fi
 ## Download dependencies
 echo "== Checking or downloading dependencies... =="
 
+if [ "$FORCE_DOWNLOAD" = "true" ]; then
+echo "== Overwriting already downloaded files =="
+fi
+
 function dl_dep() {
-	if [ ! -f "deps/$1" ]; then
-		wget -O deps/$1 $2
+	if [ ! -f "deps/$1" ] || [ "$FORCE_DOWNLOAD" = "true" ]; then
+		wget -q --show-progress -O deps/$1 $2
 	fi
 }
 
@@ -137,28 +147,48 @@ else
 fi
 
 # To find the URL for these packages:
-# - Go to https://launchpad.net/ubuntu/bionic/arm64/<package name>/
+# - Go to https://launchpad.net/ubuntu/focal/arm64/<package name>/
 # - Under 'Publishing history', click the version number in the top row
 # - Under 'Downloadable files', use the URL of the .deb file
 # - Change http to https
+#
+# Based on Ubuntu Focal (24.2.2021)
 
-dl_dep libc6-arm64.deb https://launchpadlibrarian.net/365857916/libc6_2.27-3ubuntu1_arm64.deb
-dl_dep busybox-arm64.deb https://launchpadlibrarian.net/414117084/busybox_1.27.2-2ubuntu3.2_arm64.deb
-dl_dep libcom-err2-arm64.deb https://launchpadlibrarian.net/444344115/libcom-err2_1.44.1-1ubuntu1.2_arm64.deb
-dl_dep libblkid1-arm64.deb https://launchpadlibrarian.net/438655401/libblkid1_2.31.1-0.4ubuntu3.4_arm64.deb
-dl_dep libuuid1-arm64.deb https://launchpadlibrarian.net/438655406/libuuid1_2.31.1-0.4ubuntu3.4_arm64.deb
-dl_dep libext2fs2-arm64.deb https://launchpadlibrarian.net/444344116/libext2fs2_1.44.1-1ubuntu1.2_arm64.deb
-dl_dep e2fsprogs-arm64.deb https://launchpadlibrarian.net/444344112/e2fsprogs_1.44.1-1ubuntu1.2_arm64.deb
-dl_dep parted-arm64.deb https://launchpadlibrarian.net/415806982/parted_3.2-20ubuntu0.2_arm64.deb
-dl_dep libparted2-arm64.deb https://launchpadlibrarian.net/415806981/libparted2_3.2-20ubuntu0.2_arm64.deb
-dl_dep libreadline7-arm64.deb https://launchpadlibrarian.net/354246199/libreadline7_7.0-3_arm64.deb
-dl_dep libtinfo5-arm64.deb https://launchpadlibrarian.net/371711519/libtinfo5_6.1-1ubuntu1.18.04_arm64.deb
-dl_dep libdevmapper1-arm64.deb https://launchpadlibrarian.net/431292125/libdevmapper1.02.1_1.02.145-4.1ubuntu3.18.04.1_arm64.deb
-dl_dep libselinux1-arm64.deb https://launchpadlibrarian.net/359065467/libselinux1_2.7-2build2_arm64.deb
-dl_dep libudev1-arm64.deb https://launchpadlibrarian.net/444834685/libudev1_237-3ubuntu10.31_arm64.deb
-dl_dep libpcre3-arm64.deb https://launchpadlibrarian.net/355683636/libpcre3_8.39-9_arm64.deb
-dl_dep util-linux-arm64.deb https://launchpadlibrarian.net/438655410/util-linux_2.31.1-0.4ubuntu3.4_arm64.deb
-dl_dep rpi-firmware-nonfree-master.zip https://github.com/RPi-Distro/firmware-nonfree/archive/master.zip
+
+# https://launchpad.net/ubuntu/focal/arm64/libc6
+dl_dep libc6-arm64.deb https://launchpadlibrarian.net/511641362/libc6_2.31-0ubuntu9.2_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/busybox
+dl_dep busybox-arm64.deb https://launchpadlibrarian.net/507333443/busybox_1.30.1-4ubuntu6.3_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libcom-err2
+dl_dep libcom-err2-arm64.deb https://launchpadlibrarian.net/464908553/libcom-err2_1.45.5-2ubuntu1_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libblkid1
+dl_dep libblkid1-arm64.deb https://launchpadlibrarian.net/495153624/libblkid1_2.34-0.1ubuntu9.1_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libuuid1
+dl_dep libuuid1-arm64.deb https://launchpadlibrarian.net/495153628/libuuid1_2.34-0.1ubuntu9.1_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libext2fs2
+dl_dep libext2fs2-arm64.deb https://launchpadlibrarian.net/464908555/libext2fs2_1.45.5-2ubuntu1_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/e2fsprogs
+dl_dep e2fsprogs-arm64.deb https://launchpadlibrarian.net/464908549/e2fsprogs_1.45.5-2ubuntu1_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/parted
+dl_dep parted-arm64.deb https://launchpadlibrarian.net/509452140/parted_3.3-4ubuntu0.20.04.1_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libparted2
+dl_dep libparted2-arm64.deb https://launchpadlibrarian.net/509452139/libparted2_3.3-4ubuntu0.20.04.1_arm64.deb
+#https://launchpad.net/ubuntu/focal/arm64/libreadline8
+dl_dep libreadline8-arm64.deb https://launchpadlibrarian.net/466544908/libreadline8_8.0-4_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libtinfo6
+dl_dep libtinfo6-arm64.deb https://launchpadlibrarian.net/466644524/libtinfo6_6.2-0ubuntu2_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libdevmapper1.02.1
+dl_dep libdevmapper-arm64.deb https://launchpadlibrarian.net/464878608/libdevmapper1.02.1_1.02.167-1ubuntu1_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libselinux1
+dl_dep libselinux1-arm64.deb https://launchpadlibrarian.net/455286527/libselinux1_3.0-1_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libudev1
+dl_dep libudev1-arm64.deb https://launchpadlibrarian.net/516706664/libudev1_245.4-4ubuntu3.4_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libpcre3
+dl_dep libpcre3-arm64.deb https://launchpadlibrarian.net/418361898/libpcre3_8.39-12_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/libpcre2-8-0
+dl_dep libpcre2-8-arm64.deb https://launchpadlibrarian.net/454724914/libpcre2-8-0_10.34-7_arm64.deb
+# https://launchpad.net/ubuntu/focal/arm64/util-linux
+dl_dep util-linux-arm64.deb https://launchpadlibrarian.net/495153631/util-linux_2.34-0.1ubuntu9.1_arm64.deb
 
 ## Make the image (capacity in MB, not MiB)
 echo "== Making image and filesystems... =="
@@ -335,12 +365,13 @@ unpack_deb "util-linux-arm64.deb" "root"
 mkdir root-resize
 unpack_deb "parted-arm64.deb" "root-resize"
 unpack_deb "libparted2-arm64.deb" "root-resize"
-unpack_deb "libreadline7-arm64.deb" "root-resize"
-unpack_deb "libtinfo5-arm64.deb" "root-resize"
-unpack_deb "libdevmapper1-arm64.deb" "root-resize"
+unpack_deb "libreadline8-arm64.deb" "root-resize"
+unpack_deb "libtinfo6-arm64.deb" "root-resize"
+unpack_deb "libdevmapper-arm64.deb" "root-resize"
 unpack_deb "libselinux1-arm64.deb" "root-resize"
 unpack_deb "libudev1-arm64.deb" "root-resize"
 unpack_deb "libpcre3-arm64.deb" "root-resize"
+unpack_deb "libpcre2-8-arm64.deb" "root-resize"
 
 sudo tar -cJf root/root-resize.tar.xz "root-resize"
 sudo rm -rf root-resize
