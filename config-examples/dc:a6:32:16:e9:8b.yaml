@@ -7,3 +7,5 @@ k3os:
   - NTP_SERVER_IP_OR_HOSTNAME
   k3s_args:
   - server
+  labels:
+    k3os.io/upgrade: enabled
