@@ -241,11 +241,11 @@ kernel=kernel8.img
 [all]
 EOF
 	PARTUUID=$(sudo blkid -o export $LODEV_ROOT | grep PARTUUID)
-	echo "dwc_otg.lpm_enable=0 root=$PARTUUID rootfstype=ext4 elevator=deadline cgroup_memory=1 cgroup_enable=memory rootwait init=/sbin/init.resizefs ro" | sudo tee boot/cmdline.txt >/dev/null
+	echo "dwc_otg.lpm_enable=0 root=$PARTUUID rootfstype=ext4 cgroup_memory=1 cgroup_enable=memory rootwait init=/sbin/init.resizefs ro" | sudo tee boot/cmdline.txt >/dev/null
 	sudo rm -rf $PITEMP
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	cat <<EOF | sudo tee root/boot/env.txt >/dev/null
-extraargs=elevator=deadline rootwait init=/sbin/init.resizefs ro
+extraargs=rootwait init=/sbin/init.resizefs ro
 EOF
 	sudo install -m 0644 -o root -g root orangepipc2-boot.cmd root/boot/boot.cmd
 	sudo mkimage -C none -A arm -T script -d root/boot/boot.cmd root/boot/boot.scr
