@@ -1,8 +1,21 @@
-# n3
+
+# Node_2
 ssh_authorized_keys:
 - ssh-rsa AAAAB3N...
-hostname: n3
+hostname: Node_2
 k3os:
+  data_sources:
+    - aws
+    - cdrom
+  modules:
+    - kvm
+    - nvme
+  sysctl:
+    kernel.printk: "4 4 1 7"
+    kernel.kptr_restrict: "1"
+  dns_nameservers:
+    - DNS_SERVER1
+    - DNS_SERVER2
   ntp_servers:
   - NTP_SERVER_IP_OR_HOSTNAME
   k3s_args:
