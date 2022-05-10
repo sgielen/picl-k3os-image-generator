@@ -32,7 +32,7 @@ To autoupgrade to new k3os versions you may enable the k3os upgrade feature by a
 ```
 k3os:
     labels:
-        k3os.io/upgrade: enabled
+        k3os.io/upgrade: latest
 
 ```
 

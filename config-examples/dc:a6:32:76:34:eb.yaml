@@ -10,4 +10,4 @@ k3os:
   token: MASTER_TOKEN
   server_url: https://MASTER_IP:6443
   labels:
-    k3os.io/upgrade: enabled
+    k3os.io/upgrade: latest
