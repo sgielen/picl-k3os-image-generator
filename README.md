@@ -28,9 +28,17 @@ run `sudo mount -o remount,rw /k3os/system` on the running systems and make the 
 reboot. Make sure to keep the config.yaml up-to-date with the respective yaml in your checkout of this repository, in case
 you do need to provision a new image, though!
 
-When new versions of k3os come out, or there are changes to this repository that you want to perform onto your devices, it's
+To autoupgrade to new k3os versions you may enable the k3os upgrade feature by adding this label to your `config.yaml`
+```
+k3os:
+    labels:
+        k3os.io/upgrade: enabled
+
+```
+
+In case there are major changes to this repository and you want to perform a reinstall on your devices, it's
 easiest to create a new image and flash it onto the device. However, depending on where your cluster data is stored, this may
-mean you need to reapply cluster configs to your master. This is a TODO, as I'd like to make this easier.
+mean you need to reapply cluster configs to your master or use a k8s backup and restore solution like [velero](https://velero.io/).
 
 ## Troubleshooting
 

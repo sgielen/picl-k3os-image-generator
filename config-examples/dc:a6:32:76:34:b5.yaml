@@ -9,3 +9,5 @@ k3os:
   - agent
   token: MASTER_TOKEN
   server_url: https://MASTER_IP:6443
+  labels:
+    k3os.io/upgrade: enabled
