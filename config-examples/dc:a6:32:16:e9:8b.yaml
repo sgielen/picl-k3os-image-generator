@@ -8,4 +8,4 @@ k3os:
   k3s_args:
   - server
   labels:
-    k3os.io/upgrade: enabled
+    k3os.io/upgrade: latest
