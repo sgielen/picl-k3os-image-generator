@@ -133,7 +133,7 @@ if [ -z "${K3OS_VERSION}" ]; then
     dl_dep k3os-rootfs-arm64.tar.gz https://github.com/rancher/k3os/releases/download/${DEFAULT_GOOD_K3OS_VERSION}/k3os-rootfs-arm64.tar.gz
 elif [ "${K3OS_VERSION}" = "latest" ]; then
     echo "K3OS_VERSION env variable set to 'latest' - using latest release"
-    dl_dep k3os-rootfs-arm64.tar.gz "$(wget -qO - https://api.github.com/repos/rancher/k3os/releases/latest | jq -r '.assets[] | select(.name == "k3os-rootfs-amd64.tar.gz") .browser_download_url')"
+    dl_dep k3os-rootfs-arm64.tar.gz "$(wget -qO - https://api.github.com/repos/rancher/k3os/releases/latest | jq -r '.assets[] | select(.name == "k3os-rootfs-arm64.tar.gz") .browser_download_url')"
 else
     echo "K3OS_VERSION env variable set to ${K3OS_VERSION}"
     dl_dep k3os-rootfs-arm64.tar.gz https://github.com/rancher/k3os/releases/download/${K3OS_VERSION}/k3os-rootfs-arm64.tar.gz
