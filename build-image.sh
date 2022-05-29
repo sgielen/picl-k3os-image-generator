@@ -244,7 +244,8 @@ kernel=kernel8.img
 [all]
 EOF
 	PARTUUID=$(sudo blkid -o export $LODEV_ROOT | grep PARTUUID)
-	echo "dwc_otg.lpm_enable=0 root=$PARTUUID rootfstype=ext4 cgroup_memory=1 cgroup_enable=memory rootwait init=/sbin/init.resizefs ro" | sudo tee boot/cmdline.txt >/dev/null
+	QUIRKS=$( [ -f quirks.txt ] && cat quirks.txt)
+	echo "dwc_otg.lpm_enable=0 root=$PARTUUID rootfstype=ext4 cgroup_memory=1 cgroup_enable=memory rootwait init=/sbin/init.resizefs ro $QUIRKS" | sudo tee boot/cmdline.txt >/dev/null
 	sudo rm -rf $PITEMP
 elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	cat <<EOF | sudo tee root/boot/env.txt >/dev/null

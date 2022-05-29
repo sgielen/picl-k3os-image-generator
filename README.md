@@ -61,6 +61,11 @@ the normal init script and try to start k3os manually. You may need to load addi
 
 Anytime you think the scripts or documentation could be improved, please file an issue or a PR and we'll be happy to help.
 
+### USB 3.0 disk performance issues
+
+In case you hit performance issues with USB 3.0 mass storage devices adding the devices to `quirks.txt` may help.
+See [example](https://www.raspberrypi.org/forums/viewtopic.php?t=245931)
+
 ## Docker
 
 You can build this project in Docker, e.g. when you'd rather not install dependencies on your host machine or when you're
