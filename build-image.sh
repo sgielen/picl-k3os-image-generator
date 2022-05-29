@@ -191,7 +191,7 @@ elif [ "$IMAGE_TYPE" = "orangepipc2" ]; then
 	dd if=deps/armbian_orangepipc2.img of=$IMAGE bs=512 skip=1 seek=1 count=8191 conv=notrunc
 fi
 
-LODEV=`sudo losetup --show -f $IMAGE`
+LODEV=`sudo losetup --show -P -f $IMAGE`
 sudo partprobe -s $LODEV
 sleep 1
 
