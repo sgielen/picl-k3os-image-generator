@@ -69,6 +69,7 @@ assert_tool blkid
 assert_tool 7z
 assert_tool dd
 assert_tool jq
+assert_tool envsubst
 
 ## Check if we are building a supported image
 IMAGE_TYPE=$1
