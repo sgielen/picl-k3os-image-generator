@@ -69,6 +69,7 @@ assert_tool blkid
 assert_tool 7z
 assert_tool dd
 assert_tool jq
+assert_tool envsubst
 
 ## Check if we are building a supported image
 IMAGE_TYPE=$1
@@ -260,6 +261,11 @@ echo "== Installing... =="
 sudo tar -xf deps/k3os-rootfs-arm64.tar.gz --strip 1 -C root
 # config.yaml will be created by init.resizefs based on MAC of eth0
 sudo cp -R config root/k3os/system
+
+find "config/" -maxdepth 1 -type f -name '*.yaml' -print0 | while IFS= read -r -d $'\0' file; do
+	envsubst < "$file" | sudo tee "root/k3os/system/config/$(basename "$file")" > /dev/null
+done
+
 for filename in root/k3os/system/config/*.*; do [ "$filename" != "${filename,,}" ] && sudo mv "$filename" "${filename,,}" ; done 
 K3OS_VERSION=$(ls --indicator-style=none root/k3os/system/k3os | grep -v current | head -n1)
 

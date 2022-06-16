@@ -11,6 +11,7 @@ This project can be used to generate images for k3os compatible with various arm
 
 - First, make a list of devices you want to use in your k3s cluster, their hardware types and the MAC addresses of their eth0 interface. (To find the MAC, boot any supported OS, perhaps the one that comes on the included SD card if you have one, and `cat /sys/class/net/eth0/address`. Or, just continue with a dummy config and the initial boot will say "there is no config for MAC xx:xx:xx:xx:xx:xx", and then you know what to call it.)
 - In the config/ directory, create one configuration file for each device, named as `{MAC}.yaml` (e.g. `dc:a6:32:aa:bb:cc.yaml`). The appropriate file will be used as a config.yaml eventually.
+    - You can use environment variable references in these configuration files. During execution of `./build-image.sh` the references will be expanded via `envsubst`.
 - For Raspberry Pi devices, you can choose which firmware to use for the build by setting an env variable `RASPBERRY_PI_FIRMWARE`
     - If unset, the script uses a known good version (set as `DEFAULT_GOOD_PI_VERSION` in the script)
     - Set to `latest`, which instructs the script to always pull the latest version available in the raspberry pi firmware repo (e.g. `export RASPBERRY_PI_FIRMWARE=latest`)
