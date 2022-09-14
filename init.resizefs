@@ -37,8 +37,9 @@ resize2fs $ROOTDEVICE
 sleep 5
 
 echo "== Setting proper init... =="
+ROOTPARTITION=$(lsblk -o NAME -lnp "${ROOTDISK}" | awk 'NR==2')
 if [ "$IMAGE_TYPE" = "raspberrypi" ]; then
-	mount ${ROOTDISK}p1 /boot
+	mount ${ROOTPARTITION} /boot
 	sed -i 's# init=/sbin/init.resizefs# init=/sbin/init.preinit#' /boot/cmdline.txt
 	NEW_PARTUUID=$(blkid -o export $ROOTDEVICE | grep PARTUUID)
 	sed -i "s# root=PARTUUID=$PARTUUID # root=$NEW_PARTUUID #" /boot/cmdline.txt

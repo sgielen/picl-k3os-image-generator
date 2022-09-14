@@ -150,6 +150,8 @@ dl_dep libc6-arm64.deb https://launchpadlibrarian.net/365857916/libc6_2.27-3ubun
 dl_dep busybox-arm64.deb https://launchpadlibrarian.net/414117084/busybox_1.27.2-2ubuntu3.2_arm64.deb
 dl_dep libcom-err2-arm64.deb https://launchpadlibrarian.net/444344115/libcom-err2_1.44.1-1ubuntu1.2_arm64.deb
 dl_dep libblkid1-arm64.deb https://launchpadlibrarian.net/438655401/libblkid1_2.31.1-0.4ubuntu3.4_arm64.deb
+dl_dep libmount1-arm64.deb https://launchpadlibrarian.net/497838944/libmount1_2.31.1-0.4ubuntu3.7_arm64.deb
+dl_dep libsmartcols1-arm64.deb https://launchpadlibrarian.net/497838945/libsmartcols1_2.31.1-0.4ubuntu3.7_arm64.deb
 dl_dep libuuid1-arm64.deb https://launchpadlibrarian.net/438655406/libuuid1_2.31.1-0.4ubuntu3.4_arm64.deb
 dl_dep libext2fs2-arm64.deb https://launchpadlibrarian.net/444344116/libext2fs2_1.44.1-1ubuntu1.2_arm64.deb
 dl_dep e2fsprogs-arm64.deb https://launchpadlibrarian.net/444344112/e2fsprogs_1.44.1-1ubuntu1.2_arm64.deb
@@ -351,6 +353,8 @@ unpack_deb "libdevmapper1-arm64.deb" "root-resize"
 unpack_deb "libselinux1-arm64.deb" "root-resize"
 unpack_deb "libudev1-arm64.deb" "root-resize"
 unpack_deb "libpcre3-arm64.deb" "root-resize"
+unpack_deb "libmount1-arm64.deb" "root-resize"
+unpack_deb "libsmartcols1-arm64.deb" "root-resize"
 
 sudo tar -cJf root/root-resize.tar.xz "root-resize"
 sudo rm -rf root-resize
