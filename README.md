@@ -1,3 +1,6 @@
+:warning: **This project is archived.** :warning:<br/>
+[k3os itself is dead](https://github.com/rancher/k3os/issues/846), and I have since switched to simply installing k3s on a bare Ubuntu install. Thank you to all collaborators and users!
+
 # PiCl k3os image generator
 
 This project can be used to generate images for k3os compatible with various armv8 (aarch64) devices:
